@@ -1,7 +1,4 @@
-<div align="center">
-  <img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-  <h1>ChAIid: AI-Powered Infant Healthcare Companion</h1>
-</div>
+
 
 ## Overview
 ChAIid is a cutting-edge pediatric health platform designed specifically for the unique socio-economic needs of parents in developing regions. By blending Generative AI, visual analysis, and deep localization, ChAIid reduces the friction of proactive infant healthcare.
