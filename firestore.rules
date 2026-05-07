@@ -1,0 +1,104 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        ((exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
+          (request.auth.token.email == "vennila498@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.user_id;
+    }
+
+    function isBabyOwner(babyId) {
+      return isAuthenticated() && get(/databases/$(database)/documents/babies/$(babyId)).data.user_id == request.auth.uid;
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+    function isValidUser(data) {
+      return hasOnlyAllowedFields(['phone', 'name', 'language', 'created_at', 'role']) &&
+             data.phone is string && (data.phone == "" || data.phone.size() >= 10) &&
+             data.created_at is string;
+    }
+
+    function isValidBaby(data) {
+      return hasOnlyAllowedFields(['user_id', 'name', 'dob', 'gender', 'photo_url', 'is_preterm', 'weeks_gestation', 'birth_weight', 'current_weight', 'current_height', 'muac', 'created_at']) &&
+             data.user_id is string && data.name is string && data.name.size() > 0 &&
+             data.dob is string && data.created_at is string;
+    }
+
+    function isValidHospital(data) {
+      return hasOnlyAllowedFields(['name', 'lat', 'lon', 'address', 'specialties', 'isEmergency', 'isOpen24x7', 'hasNICU', 'hasVaccination', 'type', 'rating', 'userRatingsTotal', 'created_at']) &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 200 &&
+             data.lat is number && data.lon is number &&
+             data.address is string && data.address.size() > 0 &&
+             data.type in ['govt', 'private'];
+    }
+
+    function isValidVaccineRecord(data) {
+      return hasOnlyAllowedFields(['baby_id', 'vaccine_name', 'scheduled_date', 'given_date', 'hospital_id', 'hospital_name', 'hospital_location', 'status', 'updated_at', 'user_id']) &&
+             data.baby_id is string && data.vaccine_name is string &&
+             data.status in ['pending', 'done', 'overdue'];
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isOwner(userId) && isValidUser(request.resource.data) && (request.resource.data.role == 'user' || isAdmin());
+    }
+
+    match /hospitals/{hospitalId} {
+      allow read: if true; // Hospitals are public
+      allow create, update: if isAuthenticated() && isValidHospital(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /babies/{babyId} {
+      allow read: if isAuthenticated() && (resource.data.user_id == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && request.resource.data.user_id == request.auth.uid && isValidBaby(request.resource.data);
+      allow update: if isAuthenticated() && (resource.data.user_id == request.auth.uid || isAdmin()) && isValidBaby(request.resource.data);
+      allow delete: if isAuthenticated() && (resource.data.user_id == request.auth.uid || isAdmin());
+    }
+
+    match /daily_logs/{logId} {
+      allow read: if isAuthenticated() && (isBabyOwner(resource.data.baby_id) || isAdmin());
+      allow create: if isAuthenticated() && isBabyOwner(request.resource.data.baby_id);
+      allow update: if isAuthenticated() && (isBabyOwner(resource.data.baby_id) || isAdmin());
+      allow delete: if isAuthenticated() && (isBabyOwner(resource.data.baby_id) || isAdmin());
+    }
+
+    match /chat_messages/{messageId} {
+      allow read: if isAuthenticated() && (resource.data.user_id == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && request.resource.data.user_id == request.auth.uid;
+      allow update: if isAuthenticated() && (resource.data.user_id == request.auth.uid || isAdmin());
+      allow delete: if isAuthenticated() && (resource.data.user_id == request.auth.uid || isAdmin());
+    }
+
+    match /vaccine_records/{recordId} {
+      allow read: if isAuthenticated() && (isBabyOwner(resource.data.baby_id) || isAdmin());
+      allow create: if isAuthenticated() && isBabyOwner(request.resource.data.baby_id) && isValidVaccineRecord(request.resource.data);
+      allow update: if isAuthenticated() && (isBabyOwner(resource.data.baby_id) || isAdmin()) && isValidVaccineRecord(request.resource.data);
+      allow delete: if isAuthenticated() && (isBabyOwner(resource.data.baby_id) || isAdmin());
+    }
+  }
+}

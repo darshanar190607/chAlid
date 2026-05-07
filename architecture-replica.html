@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChAIid Interactive Flow Diagram</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #f8fafc; 
+            margin: 0;
+            overflow: hidden; /* Prevent scrollbars when dragging */
+        }
+        
+        .header {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            pointer-events: none;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #0f172a;
+        }
+        
+        .header p {
+            margin: 5px 0 0 0;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        #canvas {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .entity {
+            position: absolute;
+            width: 220px;
+            background: white;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .entity-header {
+            padding: 10px;
+            border-bottom: 1px solid #334155;
+            font-weight: bold;
+            text-align: center;
+            background: #f1f5f9;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .entity-header:active {
+            cursor: grabbing;
+        }
+
+        .entity-body {
+            padding: 10px;
+            font-size: 13px;
+            color: #334155;
+        }
+
+        .attribute {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+        
+        .attr-name {
+            font-family: monospace;
+        }
+
+        .pk { font-weight: bold; color: #0f172a; }
+        .fk { font-style: italic; color: #2563eb; }
+
+        .conn-label {
+            position: absolute;
+            font-size: 12px;
+            font-weight: bold;
+            background: white;
+            padding: 2px 4px;
+            border-radius: 4px;
+            border: 1px solid #cbd5e1;
+            z-index: 5;
+            pointer-events: none;
+            color: #334155;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>ChAIid Database Schema</h1>
+        <p>Drag the boxes to rearrange the flow diagram.</p>
+    </div>
+
+    <div id="canvas">
+        <svg id="svg-canvas"></svg>
+
+        <!-- Entities -->
+        <div class="entity" id="User" style="left: 450px; top: 100px;">
+            <div class="entity-header">User</div>
+            <div class="entity-body">
+                <div class="attribute"><span class="attr-name pk">id (PK)</span></div>
+                <div class="attribute"><span class="attr-name">firebaseUid</span></div>
+                <div class="attribute"><span class="attr-name">name</span></div>
+                <div class="attribute"><span class="attr-name">phone</span></div>
+                <div class="attribute"><span class="attr-name">language</span></div>
+            </div>
+        </div>
+
+        <div class="entity" id="SymptomAnalysis" style="left: 100px; top: 100px;">
+            <div class="entity-header">SymptomAnalysis</div>
+            <div class="entity-body">
+                <div class="attribute"><span class="attr-name pk">id (PK)</span></div>
+                <div class="attribute"><span class="attr-name fk">userId (FK)</span></div>
+                <div class="attribute"><span class="attr-name">category</span></div>
+                <div class="attribute"><span class="attr-name">confidence</span></div>
+                <div class="attribute"><span class="attr-name">severity</span></div>
+                <div class="attribute"><span class="attr-name">result</span></div>
+            </div>
+        </div>
+
+        <div class="entity" id="Baby" style="left: 450px; top: 350px;">
+            <div class="entity-header">Baby</div>
+            <div class="entity-body">
+                <div class="attribute"><span class="attr-name pk">id (PK)</span></div>
+                <div class="attribute"><span class="attr-name fk">userId (FK)</span></div>
+                <div class="attribute"><span class="attr-name">name</span></div>
+                <div class="attribute"><span class="attr-name">dob</span></div>
+                <div class="attribute"><span class="attr-name">gender</span></div>
+                <div class="attribute"><span class="attr-name">birthWeight</span></div>
+                <div class="attribute"><span class="attr-name">isPremature</span></div>
+            </div>
+        </div>
+
+        <div class="entity" id="ChatMessage" style="left: 100px; top: 350px;">
+            <div class="entity-header">ChatMessage</div>
+            <div class="entity-body">
+                <div class="attribute"><span class="attr-name pk">id (PK)</span></div>
+                <div class="attribute"><span class="attr-name fk">babyId (FK)</span></div>
+                <div class="attribute"><span class="attr-name">role</span></div>
+                <div class="attribute"><span class="attr-name">content</span></div>
+                <div class="attribute"><span class="attr-name">severity</span></div>
+            </div>
+        </div>
+
+        <div class="entity" id="DailyPhoto" style="left: 450px; top: 650px;">
+            <div class="entity-header">DailyPhoto</div>
+            <div class="entity-body">
+                <div class="attribute"><span class="attr-name pk">id (PK)</span></div>
+                <div class="attribute"><span class="attr-name fk">babyId (FK)</span></div>
+                <div class="attribute"><span class="attr-name">imageUrl</span></div>
+                <div class="attribute"><span class="attr-name">isHealthy</span></div>
+            </div>
+        </div>
+
+        <div class="entity" id="VaccineRecord" style="left: 800px; top: 350px;">
+            <div class="entity-header">VaccineRecord</div>
+            <div class="entity-body">
+                <div class="attribute"><span class="attr-name pk">id (PK)</span></div>
+                <div class="attribute"><span class="attr-name fk">babyId (FK)</span></div>
+                <div class="attribute"><span class="attr-name fk">hospitalId (FK)</span></div>
+                <div class="attribute"><span class="attr-name">vaccineName</span></div>
+                <div class="attribute"><span class="attr-name">status</span></div>
+                <div class="attribute"><span class="attr-name">scheduledDate</span></div>
+            </div>
+        </div>
+
+        <div class="entity" id="Hospital" style="left: 1150px; top: 350px;">
+            <div class="entity-header">Hospital</div>
+            <div class="entity-body">
+                <div class="attribute"><span class="attr-name pk">id (PK)</span></div>
+                <div class="attribute"><span class="attr-name">name</span></div>
+                <div class="attribute"><span class="attr-name">type</span></div>
+                <div class="attribute"><span class="attr-name">city</span></div>
+                <div class="attribute"><span class="attr-name">rating</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const connections = [
+            { from: 'User', to: 'Baby', label: '1..*' },
+            { from: 'User', to: 'SymptomAnalysis', label: '1..*' },
+            { from: 'Baby', to: 'ChatMessage', label: '1..*' },
+            { from: 'Baby', to: 'VaccineRecord', label: '1..*' },
+            { from: 'Baby', to: 'DailyPhoto', label: '1..*' },
+            { from: 'Hospital', to: 'VaccineRecord', label: '1..*' }
+        ];
+
+        const svg = document.getElementById('svg-canvas');
+        const canvas = document.getElementById('canvas');
+
+        function updateConnections() {
+            connections.forEach((conn, index) => {
+                const fromEl = document.getElementById(conn.from);
+                const toEl = document.getElementById(conn.to);
+                
+                // Draw Line
+                let lineId = 'line-' + index;
+                let line = document.getElementById(lineId);
+                if (!line) {
+                    line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('id', lineId);
+                    line.setAttribute('stroke', '#334155');
+                    line.setAttribute('stroke-width', '2');
+                    svg.appendChild(line);
+                }
+                
+                const rect1 = fromEl.getBoundingClientRect();
+                const rect2 = toEl.getBoundingClientRect();
+                
+                const x1 = rect1.left + rect1.width / 2;
+                const y1 = rect1.top + rect1.height / 2;
+                const x2 = rect2.left + rect2.width / 2;
+                const y2 = rect2.top + rect2.height / 2;
+                
+                line.setAttribute('x1', x1);
+                line.setAttribute('y1', y1);
+                line.setAttribute('x2', x2);
+                line.setAttribute('y2', y2);
+
+                // Draw Label
+                let labelId = 'label-' + index;
+                let label = document.getElementById(labelId);
+                if (!label) {
+                    label = document.createElement('div');
+                    label.setAttribute('id', labelId);
+                    label.className = 'conn-label';
+                    label.innerText = conn.label;
+                    canvas.appendChild(label);
+                }
+
+                // Position label 75% of the way along the line
+                const lx = x1 + (x2 - x1) * 0.75;
+                const ly = y1 + (y2 - y1) * 0.75;
+                
+                // Offset slightly so it's not directly on the line
+                label.style.left = (lx + 10) + 'px';
+                label.style.top = (ly - 10) + 'px';
+            });
+        }
+
+        // Dragging Logic
+        let isDragging = false;
+        let currentEl = null;
+        let offsetX = 0;
+        let offsetY = 0;
+
+        document.querySelectorAll('.entity-header').forEach(header => {
+            header.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                currentEl = e.target.closest('.entity');
+                
+                // Bring to front
+                document.querySelectorAll('.entity').forEach(el => el.style.zIndex = 10);
+                currentEl.style.zIndex = 11;
+                
+                const rect = currentEl.getBoundingClientRect();
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+            });
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging || !currentEl) return;
+            currentEl.style.left = (e.clientX - offsetX) + 'px';
+            currentEl.style.top = (e.clientY - offsetY) + 'px';
+            updateConnections();
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            currentEl = null;
+        });
+
+        // Initial render
+        updateConnections();
+        window.addEventListener('resize', updateConnections);
+    </script>
+</body>
+</html>

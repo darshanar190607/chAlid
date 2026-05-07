@@ -1,0 +1,55 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+
+# Environment files
+.env*
+!.env.example
+!.env.production.template
+
+# Prisma
+/src/generated/prisma
+
+# Next.js
+.next/
+out/
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local env files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Firebase
+firebase-debug.log
+.firebase/
+
+# AWS
+.aws/
+
+# Sensitive files
+*.pem
+*.key
+serviceAccountKey.json
+
+# Temporary error logs and dumps
+*-err.html
+*-err-*.html
+test-*.html
+*.txt
+!README.md

@@ -1,0 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=DM+Sans:wght@400;500;700&display=swap');
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+@import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
+
+@theme {
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Nunito", ui-sans-serif, system-ui, sans-serif;
+  
+  --color-primary: #FF2D55; /* Vibrant Pink */
+  --color-secondary: #FF6B35; /* Orange accent */
+  --color-accent: #FF6B35; /* Orange accent */
+  --color-background: #FFFFFF; /* White */
+  --color-navy: #1A1A2E; /* Deep Navy */
+  --color-soft-pink: #FFF0F3; /* Very Soft Pink */
+  --color-soft-orange: #FFF9F5; /* Very Soft Orange */
+  
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-3xl: 32px;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-navy font-sans antialiased;
+    background-image: radial-gradient(circle at top right, #FFF9F5 0%, #FFFFFF 100%);
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-bold;
+  }
+}
+
+@layer utilities {
+  .tap-target {
+    @apply min-h-[48px] min-w-[48px];
+  }
+  
+  .glass {
+    @apply bg-white/80 backdrop-blur-md border border-white/20;
+  }
+  
+  .shadow-soft {
+    box-shadow: 0 4px 24px rgba(233, 30, 99, 0.12);
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-primary/20 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-primary/40;
+}

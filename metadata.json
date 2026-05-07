@@ -1,0 +1,9 @@
+{
+  "name": "chAIid",
+  "description": "AI-powered baby care platform for Indian parents. Voice-first guidance in 22+ languages, hospital discovery, vaccine tracking, and symptom AI.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ]
+}

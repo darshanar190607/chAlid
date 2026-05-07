@@ -1,0 +1,128 @@
+{
+  "entities": {
+    "users": {
+      "title": "User",
+      "description": "A user of the chAIid platform.",
+      "type": "object",
+      "properties": {
+        "phone": { "type": "string", "description": "User's phone number." },
+        "name": { "type": "string", "description": "User's name." },
+        "language": { "type": "string", "description": "Preferred language (e.g., 'hi', 'ta')." },
+        "created_at": { "type": "string", "format": "date-time", "description": "Account creation timestamp." }
+      },
+      "required": ["phone", "created_at"]
+    },
+    "babies": {
+      "title": "Baby",
+      "description": "A baby profile associated with a user.",
+      "type": "object",
+      "properties": {
+        "user_id": { "type": "string", "description": "UID of the parent user." },
+        "name": { "type": "string", "description": "Baby's name." },
+        "dob": { "type": "string", "format": "date", "description": "Baby's date of birth." },
+        "gender": { "type": "string", "enum": ["male", "female", "other"], "description": "Baby's gender." },
+        "photo_url": { "type": "string", "description": "URL to baby's photo." },
+        "is_preterm": { "type": "boolean", "description": "Whether the baby was born preterm." },
+        "weeks_gestation": { "type": "number", "description": "Weeks of gestation if preterm." },
+        "birth_weight": { "type": "number", "description": "Birth weight in kg." },
+        "current_weight": { "type": "number", "description": "Latest weight in kg." },
+        "current_height": { "type": "number", "description": "Latest height in cm." },
+        "muac": { "type": "number", "description": "Latest Mid-Upper Arm Circumference in cm." },
+        "created_at": { "type": "string", "format": "date-time", "description": "Profile creation timestamp." }
+      },
+      "required": ["user_id", "name", "dob", "created_at"]
+    },
+    "daily_logs": {
+      "title": "Daily Log",
+      "description": "Daily tracking for sleep, feeding, and KMC.",
+      "type": "object",
+      "properties": {
+        "baby_id": { "type": "string", "description": "ID of the baby." },
+        "date": { "type": "string", "format": "date", "description": "Date of the log." },
+        "sleep_score": { "type": "number", "description": "Safe sleep score (0-5)." },
+        "kmc_duration_minutes": { "type": "number", "description": "Kangaroo Mother Care duration in minutes." },
+        "water_intake_ml": { "type": "number", "description": "Water intake in ml." },
+        "created_at": { "type": "string", "format": "date-time", "description": "Log creation timestamp." }
+      },
+      "required": ["baby_id", "date", "created_at"]
+    },
+    "chat_messages": {
+      "title": "Chat Message",
+      "description": "A message in a chat conversation.",
+      "type": "object",
+      "properties": {
+        "user_id": { "type": "string", "description": "UID of the user." },
+        "baby_id": { "type": "string", "description": "ID of the baby this chat is about." },
+        "role": { "type": "string", "enum": ["user", "ai"], "description": "Role of the message sender." },
+        "content": { "type": "string", "description": "Text content of the message." },
+        "language": { "type": "string", "description": "Language of the message." },
+        "severity": { "type": "string", "enum": ["low", "medium", "high"], "description": "AI-detected severity level." },
+        "created_at": { "type": "string", "format": "date-time", "description": "Message timestamp." }
+      },
+      "required": ["user_id", "role", "content", "created_at"]
+    },
+    "vaccine_records": {
+      "title": "Vaccine Record",
+      "description": "A record of a vaccine for a baby.",
+      "type": "object",
+      "properties": {
+        "baby_id": { "type": "string", "description": "ID of the baby." },
+        "vaccine_name": { "type": "string", "description": "Name of the vaccine." },
+        "scheduled_date": { "type": "string", "format": "date", "description": "Date the vaccine is scheduled." },
+        "given_date": { "type": "string", "format": "date", "description": "Date the vaccine was given." },
+        "hospital_id": { "type": "string", "description": "ID of the hospital where given." },
+        "hospital_name": { "type": "string", "description": "Name of the hospital where vaccine was given." },
+        "hospital_location": { "type": "string", "description": "Location/Address of the hospital where vaccine was given." },
+        "status": { "type": "string", "enum": ["pending", "done", "overdue"], "description": "Status of the vaccine." }
+      },
+      "required": ["baby_id", "vaccine_name", "scheduled_date", "status"]
+    },
+    "hospitals": {
+      "title": "Hospital",
+      "description": "A healthcare facility.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Hospital name." },
+        "lat": { "type": "number", "description": "Latitude." },
+        "lon": { "type": "number", "description": "Longitude." },
+        "address": { "type": "string", "description": "Full address." },
+        "specialties": { "type": "array", "items": { "type": "string" }, "description": "List of specialties." },
+        "isEmergency": { "type": "boolean", "description": "Has emergency services." },
+        "isOpen24x7": { "type": "boolean", "description": "Open 24/7." },
+        "hasNICU": { "type": "boolean", "description": "Has NICU facilities." },
+        "hasVaccination": { "type": "boolean", "description": "Has vaccination services." },
+        "type": { "type": "string", "enum": ["govt", "private"], "description": "Type of hospital." },
+        "rating": { "type": "number", "description": "Average rating." },
+        "userRatingsTotal": { "type": "number", "description": "Total number of ratings." },
+        "created_at": { "type": "string", "format": "date-time", "description": "Timestamp of creation." }
+      },
+      "required": ["name", "lat", "lon", "address", "type"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "users",
+      "description": "User profile data."
+    },
+    "/babies/{babyId}": {
+      "schema": "babies",
+      "description": "Baby profile data."
+    },
+    "/daily_logs/{logId}": {
+      "schema": "daily_logs",
+      "description": "Daily logs for sleep, KMC, and water."
+    },
+    "/chat_messages/{messageId}": {
+      "schema": "chat_messages",
+      "description": "Chat message data."
+    },
+    "/vaccine_records/{recordId}": {
+      "schema": "vaccine_records",
+      "description": "Vaccine records for babies."
+    },
+    "/hospitals/{hospitalId}": {
+      "schema": "hospitals",
+      "description": "Hospital location data."
+    }
+  }
+}

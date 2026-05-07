@@ -1,0 +1,16 @@
+{
+  "welcome": "chAIid କୁ ସ୍ୱାଗତ",
+  "startFree": "ମାଗଣାରେ ଆରମ୍ଭ କରନ୍ତୁ",
+  "seeHowItWorks": "ଏହା କିପରି କାମ କରେ ଦେଖନ୍ତୁ",
+  "askAI": "AI କୁ ପଚାରନ୍ତୁ",
+  "checkSymptom": "ଲକ୍ଷଣ ଯାଞ୍ଚ କରନ୍ତୁ",
+  "findHospital": "ଡାକ୍ତରଖାନା ଖୋଜନ୍ତୁ",
+  "vaccines": "ଟିକା",
+  "language": "ଭାଷା",
+  "logout": "ଲଗ୍ ଆଉଟ୍",
+  "goodMorning": "ଶୁଭ ସକାଳ",
+  "babyProfile": "ଶିଶୁ ପ୍ରୋଫାଇଲ୍",
+  "trackGrowth": "ବୃଦ୍ଧି ଟ୍ରାକ୍ କରନ୍ତୁ",
+  "smartVaccine": "ସ୍ମାର୍ଟ ଟିକା",
+  "aiHealthAssistant": "AI ସ୍ୱାସ୍ଥ୍ୟ ସହାୟକ"
+}

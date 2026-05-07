@@ -1,0 +1,121 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id              String            @id @default(cuid())
+  firebaseUid     String            @unique
+  phone           String?           @unique
+  name            String?
+  language        String            @default("hi")
+  abhaId          String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  babies          Baby[]
+  symptomAnalyses SymptomAnalysis[]
+}
+
+model SymptomAnalysis {
+  id              String   @id @default(cuid())
+  userId          String
+  category        String
+  result          Json
+  confidence      Float
+  severity        String
+  recommendations Json
+  imageUrl        String?
+  babyAgeMonths   Int
+  createdAt       DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id])
+}
+
+model Baby {
+  id             String          @id @default(cuid())
+  name           String
+  dob            DateTime
+  gender         String?
+  birthWeight    Float?
+  isPremature    Boolean         @default(false)
+  userId         String
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  weeksGestation Int?            @default(40)
+  description    String?
+  photoUrl       String?
+  user           User            @relation(fields: [userId], references: [id])
+  chats          ChatMessage[]
+  vaccines       VaccineRecord[]
+  dailyPhotos    DailyPhoto[]
+  weightLogs     WeightLog[]
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  content   String
+  role        String
+  severity    String?
+  babyId      String
+  createdAt   DateTime @default(now())
+  language    String?
+  isTNSchemes Boolean  @default(false)
+  baby      Baby     @relation(fields: [babyId], references: [id])
+}
+
+model VaccineRecord {
+  id               String    @id @default(cuid())
+  vaccineName      String
+  scheduledDate    DateTime
+  givenDate        DateTime?
+  status           String    @default("pending")
+  babyId           String
+  hospitalId       String?
+  hospitalLocation String?
+  hospitalName     String?
+  baby             Baby      @relation(fields: [babyId], references: [id])
+  hospital         Hospital? @relation(fields: [hospitalId], references: [id])
+}
+
+model Hospital {
+  id        String          @id @default(cuid())
+  name      String          @unique
+  type      String
+  city      String?
+  state     String?
+  lat       Float
+  lng       Float
+  isFree    Boolean         @default(false)
+  hasNicu   Boolean         @default(false)
+  phone     String?
+  rating    Float?          @default(0)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  address   String?
+  vaccines  VaccineRecord[]
+}
+
+model DailyPhoto {
+  id             String   @id @default(cuid())
+  babyId         String
+  imageUrl       String
+  date           DateTime @default(now())
+  isHealthy      Boolean  @default(true)
+  analysisResult Json?
+  baby           Baby     @relation(fields: [babyId], references: [id])
+}
+
+model WeightLog {
+  id        String   @id @default(cuid())
+  babyId    String
+  weightKg  Float
+  heightCm  Float?
+  loggedAt  DateTime @default(now())
+  note      String?
+  baby      Baby     @relation(fields: [babyId], references: [id])
+}
